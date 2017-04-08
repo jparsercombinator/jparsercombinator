@@ -21,22 +21,22 @@ class CombinatorMany<T> implements Combinator<List<T>> {
   public Result<List<T>> apply(String input) {
     List<T> results = new ArrayList<>();
 
-    String lastSuccessfulInput = input;
+    String remainingInput = input;
     Result<T> result = combinator.apply(input);
 
     while (result.isAccepted()) {
-      lastSuccessfulInput = result.remainingInput();
+      remainingInput = result.remainingInput();
 
       results.add(result.result());
 
       if (separator == null) {
-        result = combinator.apply(lastSuccessfulInput);
+        result = combinator.apply(remainingInput);
       } else {
-        result = applySeparatorThenCombinator(lastSuccessfulInput);
+        result = applySeparatorThenCombinator(remainingInput);
       }
     }
 
-    return new Accept<>(results, lastSuccessfulInput);
+    return new Accept<>(results, remainingInput);
   }
 
   private Result<T> applySeparatorThenCombinator(String input) {
