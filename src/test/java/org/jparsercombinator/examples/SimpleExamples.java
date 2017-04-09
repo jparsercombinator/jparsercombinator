@@ -4,6 +4,7 @@ import static org.jparsercombinator.Combinators.*;
 import static org.jparsercombinator.Parsers.parser;
 
 import java.util.List;
+import java.util.Optional;
 import org.jparsercombinator.*;
 
 import org.junit.Test;
@@ -36,10 +37,14 @@ public class SimpleExamples {
     rejected.errorMessage();  // ...
 
     // For simpler end use, we can wrap Combinator with Parser.parser, e.g.
-    Parser<String> fooParser = parser(fooParserCombinator);
-    fooParser.apply("foo");  // "foo"
-    fooParser.apply("bar");  // throws ParseException
+    Parser<Optional<String>> optionalReturningFooParser = parser(fooParserCombinator,
+        System.err::println);
+    optionalReturningFooParser.apply("foo");  // Optional[foo]
+    optionalReturningFooParser.apply("bar");  // Optional.empty (an error message is also printed to System.err)
 
+    Parser<String> exceptionThrowingFooParser = parser(fooParserCombinator);
+    exceptionThrowingFooParser.apply("foo");  // "foo"
+    exceptionThrowingFooParser.apply("bar");  // throws ParseException
   }
 
   @Test(expected = ParseException.class)
