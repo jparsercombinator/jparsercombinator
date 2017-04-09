@@ -16,10 +16,10 @@ public final class ParserCombinators {
   }
 
   public static ParserCombinator<String> regex(String regex) {
-    return regexFullResult(regex).map(MatchResult::group);
+    return regexMatchResult(regex).map(MatchResult::group);
   }
 
-  public static ParserCombinator<MatchResult> regexFullResult(String regex) {
+  public static ParserCombinator<MatchResult> regexMatchResult(String regex) {
     return new RegexParserCombinator(Pattern.compile(regex));
   }
 

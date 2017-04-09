@@ -3,7 +3,7 @@ package org.jparsercombinator.examples.json;
 
 import static org.jparsercombinator.ParserCombinators.newRef;
 import static org.jparsercombinator.ParserCombinators.regex;
-import static org.jparsercombinator.ParserCombinators.regexFullResult;
+import static org.jparsercombinator.ParserCombinators.regexMatchResult;
 import static org.jparsercombinator.ParserCombinators.skip;
 import static org.jparsercombinator.ParserCombinators.string;
 
@@ -31,7 +31,7 @@ class JsonParser implements Parser<JsonElement> {
     ParserCombinator<JsonElement> jsonIntegerParser =
         regex("[0-9]+").map(v -> new JsonPrimitive(Integer.parseInt(v)));
     ParserCombinator<JsonElement> jsonStringParser =
-        regexFullResult("\"([^\"]*)\"").map(v -> new JsonPrimitive(v.group(1)));
+        regexMatchResult("\"([^\"]*)\"").map(v -> new JsonPrimitive(v.group(1)));
     ParserCombinator<JsonElement> jsonPrimitiveParser =
         jsonStringParser.or(jsonBooleanParser).or(jsonIntegerParser);
 
