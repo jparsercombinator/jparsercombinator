@@ -1,6 +1,8 @@
 # jparsercombinator
 
-Simple parser combinator written in Java
+Simple parser combinator written in Java.
+
+Requires JDK 1.8 or higher.
 
 ## Usage examples
 
