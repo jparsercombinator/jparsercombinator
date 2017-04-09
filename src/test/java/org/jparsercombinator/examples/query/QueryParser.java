@@ -1,25 +1,24 @@
 package org.jparsercombinator.examples.query;
 
-import static org.jparsercombinator.Combinators.regex;
-import static org.jparsercombinator.Combinators.skip;
-import static org.jparsercombinator.Combinators.string;
+import static org.jparsercombinator.ParserCombinators.regex;
+import static org.jparsercombinator.ParserCombinators.skip;
+import static org.jparsercombinator.ParserCombinators.string;
 
-import org.jparsercombinator.Combinator;
-import org.jparsercombinator.CombinatorReference;
-import org.jparsercombinator.Combinators;
+import org.jparsercombinator.ParserCombinator;
+import org.jparsercombinator.ParserCombinatorReference;
+import org.jparsercombinator.ParserCombinators;
 import org.jparsercombinator.Parser;
-import org.jparsercombinator.Parsers;
 
 class QueryParser implements Parser<Query> {
 
   private Parser<Query> parser;
 
   QueryParser() {
-    CombinatorReference<Query> queryParser = Combinators.newRef();
-    CombinatorReference<Query> termParser = Combinators.newRef();
-    CombinatorReference<Query> factorParser = Combinators.newRef();
+    ParserCombinatorReference<Query> queryParser = ParserCombinators.newRef();
+    ParserCombinatorReference<Query> termParser = ParserCombinators.newRef();
+    ParserCombinatorReference<Query> factorParser = ParserCombinators.newRef();
 
-    Combinator<Query> keyValueParser = regex("\\w+").skip(string(":")).next(regex("\\w*"))
+    ParserCombinator<Query> keyValueParser = regex("\\w+").skip(string(":")).next(regex("\\w*"))
         .map(result -> new KeyValueQuery(result.first, result.second));
 
     queryParser.setCombinator(termParser.many(string(" OR ")).map(OrQuery::new));
@@ -28,7 +27,7 @@ class QueryParser implements Parser<Query> {
         .next(keyValueParser.or(skip(string("(")).next(queryParser).skip(string(")"))))
         .map(r -> r.first.isPresent() ? new NotQuery(r.second) : r.second));
 
-    parser = Parsers.parser(queryParser);
+    parser = queryParser.end();
   }
 
   @Override

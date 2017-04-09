@@ -1,16 +1,15 @@
 package org.jparsercombinator.examples.expression;
 
-import static org.jparsercombinator.Combinators.regex;
-import static org.jparsercombinator.Combinators.skip;
-import static org.jparsercombinator.Combinators.string;
+import static org.jparsercombinator.ParserCombinators.regex;
+import static org.jparsercombinator.ParserCombinators.skip;
+import static org.jparsercombinator.ParserCombinators.string;
 
 import java.util.List;
-import org.jparsercombinator.Combinator;
-import org.jparsercombinator.CombinatorReference;
-import org.jparsercombinator.Combinators;
+import org.jparsercombinator.ParserCombinator;
+import org.jparsercombinator.ParserCombinatorReference;
+import org.jparsercombinator.ParserCombinators;
 import org.jparsercombinator.Pair;
 import org.jparsercombinator.Parser;
-import org.jparsercombinator.Parsers;
 
 /**
  * Test parsing and evaluating of expressions of form:
@@ -24,16 +23,16 @@ class ExpressionParser implements Parser<Integer> {
   private static Parser<Integer> parser;
 
   ExpressionParser() {
-    Combinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
+    ParserCombinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
 
     // need to be defined as reference to avoid illegal self reference
-    CombinatorReference<Integer> expression = Combinators.newRef();
-    CombinatorReference<Integer> term = Combinators.newRef();
-    CombinatorReference<Integer> factor = Combinators.newRef();
+    ParserCombinatorReference<Integer> expression = ParserCombinators.newRef();
+    ParserCombinatorReference<Integer> term = ParserCombinators.newRef();
+    ParserCombinatorReference<Integer> factor = ParserCombinators.newRef();
 
-    Combinator<Integer> firstTerm = string("-").optional().next(term)
+    ParserCombinator<Integer> firstTerm = string("-").optional().next(term)
         .map(p -> p.first.isPresent() ? -p.second : p.second);
-    Combinator<List<Pair<String, Integer>>> restOfTheTerms =
+    ParserCombinator<List<Pair<String, Integer>>> restOfTheTerms =
         string("+").or(string("-")).next(term).many();
 
     expression.setCombinator(firstTerm.next(restOfTheTerms)
@@ -49,7 +48,7 @@ class ExpressionParser implements Parser<Integer> {
           return result;
         }));
 
-    Combinator<List<Pair<String, Integer>>> restOfTheFactors =
+    ParserCombinator<List<Pair<String, Integer>>> restOfTheFactors =
         string("*").or(string("/")).next(factor).many();
 
     term.setCombinator(factor.next(restOfTheFactors)
@@ -65,12 +64,12 @@ class ExpressionParser implements Parser<Integer> {
           return result;
         }));
 
-    Combinator<Integer> parenthesizedExpression =
+    ParserCombinator<Integer> parenthesizedExpression =
         skip(string("(")).next(expression).skip(string(")"));
 
     factor.setCombinator(parseInteger.or(parenthesizedExpression));
 
-    parser = Parsers.parser(expression);
+    parser = expression.end();
   }
 
   @Override

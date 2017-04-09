@@ -1,11 +1,11 @@
 package org.jparsercombinator;
 
-class CombinatorNext<T, R> implements Combinator<Pair<T, R>> {
+class ParserCombinatorNext<T, R> implements ParserCombinator<Pair<T, R>> {
 
-  private Combinator<T> combinator;
-  private Combinator<R> next;
+  private ParserCombinator<T> combinator;
+  private ParserCombinator<R> next;
 
-  CombinatorNext(Combinator<T> combinator, Combinator<R> next) {
+  ParserCombinatorNext(ParserCombinator<T> combinator, ParserCombinator<R> next) {
     this.combinator = combinator;
     this.next = next;
   }

@@ -2,11 +2,11 @@ package org.jparsercombinator;
 
 import java.util.Optional;
 
-class CombinatorOptional<T> implements Combinator<Optional<T>> {
+class ParserCombinatorOptional<T> implements ParserCombinator<Optional<T>> {
 
-  private Combinator<T> combinator;
+  private ParserCombinator<T> combinator;
 
-  CombinatorOptional(Combinator<T> combinator) {
+  ParserCombinatorOptional(ParserCombinator<T> combinator) {
     this.combinator = combinator;
   }
 

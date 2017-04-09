@@ -1,10 +1,8 @@
 package org.jparsercombinator.examples;
 
-import static org.jparsercombinator.Combinators.*;
-import static org.jparsercombinator.Parsers.parser;
+import static org.jparsercombinator.ParserCombinators.*;
 
 import java.util.List;
-import java.util.Optional;
 import org.jparsercombinator.*;
 
 import org.junit.Test;
@@ -14,43 +12,34 @@ public class SimpleExamples {
   @Test(expected = ParseException.class)
   public void example0() {
 
-    Parser<String> fooParser = parser(string("foo"));
+    Parser<String> fooParser = string("foo").end();
 
     fooParser.apply("foo");  // returns "foo"
     fooParser.apply("bar");  // throws ParseException
 
   }
 
-  @Test(expected = ParseException.class)
+  @Test
   public void example1() {
 
-    Combinator<String> fooParserCombinator = string("foo");
+    ParserCombinator<String> fooParserCombinator = string("foo");
 
     // apply and get the parse result, in this case "Accept" with result string and remaining input
-    Result<String> result = fooParserCombinator.apply("foo");
-    result.isAccepted();      // true
-    result.result();          // "foo"
-    result.remainingInput();  // ""
+    Result<String> accepted = fooParserCombinator.apply("foo");
+    accepted.isAccepted();      // true
+    accepted.result();          // "foo"
+    accepted.remainingInput();  // ""
 
     Result<String> rejected = fooParserCombinator.apply("bar");
-    rejected.isAccepted();    // false
-    rejected.errorMessage();  // ...
+    rejected.isAccepted();      // false
+    rejected.errorMessage();    // ...
 
-    // For simpler end use, we can wrap Combinator with Parser.parser, e.g.
-    Parser<Optional<String>> optionalReturningFooParser = parser(fooParserCombinator,
-        System.err::println);
-    optionalReturningFooParser.apply("foo");  // Optional[foo]
-    optionalReturningFooParser.apply("bar");  // Optional.empty (an error message is also printed to System.err)
-
-    Parser<String> exceptionThrowingFooParser = parser(fooParserCombinator);
-    exceptionThrowingFooParser.apply("foo");  // "foo"
-    exceptionThrowingFooParser.apply("bar");  // throws ParseException
   }
 
   @Test(expected = ParseException.class)
   public void example2() {
 
-    Parser<String> fooOrBarParser = parser(string("foo").or(string("bar")));
+    Parser<String> fooOrBarParser = string("foo").or(string("bar")).end();
 
     fooOrBarParser.apply("foo");  // returns "foo"
     fooOrBarParser.apply("bar");  // returns "bar"
@@ -61,7 +50,7 @@ public class SimpleExamples {
   @Test(expected = ParseException.class)
   public void example3() {
 
-    Parser<Pair<String, String>> fooAndBarParser = parser(string("foo").next(string("bar")));
+    Parser<Pair<String, String>> fooAndBarParser = string("foo").next(string("bar")).end();
 
     fooAndBarParser.apply("foobar");  // returns ("foo", "bar")
     fooAndBarParser.apply("foo");     // throws ParseException
@@ -71,7 +60,7 @@ public class SimpleExamples {
   @Test(expected = ParseException.class)
   public void example4() {
 
-    Parser<Integer> integerParser = parser(regex("[0-9]+").map(Integer::parseInt));
+    Parser<Integer> integerParser = regex("[0-9]+").map(Integer::parseInt).end();
 
     integerParser.apply("4");    // returns 4
     integerParser.apply("foo");  // throws ParseException
@@ -81,7 +70,7 @@ public class SimpleExamples {
   @Test(expected = ParseException.class)
   public void example5() {
 
-    Parser<List<String>> fooManyParser = parser(string("foo").many());
+    Parser<List<String>> fooManyParser = string("foo").many().end();
 
     fooManyParser.apply("foofoofoo");  // returns ["foo", "foo", "foo"]
     fooManyParser.apply("foobarfoo");  // throws ParseException
@@ -92,10 +81,10 @@ public class SimpleExamples {
   public void example6() {
 
     // example of a recursive parser
-    CombinatorReference<String> parenCombinator = newRef();
+    ParserCombinatorReference<String> parenCombinator = newRef();
     parenCombinator.setCombinator(skip(string("(")).next(parenCombinator).skip(string(")")));
 
-    Parser<String> parenParser = parser(parenCombinator);
+    Parser<String> parenParser = parenCombinator.end();
 
     parenParser.apply("()");     // ""
     parenParser.apply("(())");   // ""
@@ -108,9 +97,9 @@ public class SimpleExamples {
   public void example7() {
 
     // evaluates simple "fully parenthesized" expressions
-    Combinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
-    Combinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
-    CombinatorReference<Integer> parseExpression = newRef();
+    ParserCombinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
+    ParserCombinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
+    ParserCombinatorReference<Integer> parseExpression = newRef();
     parseExpression.setCombinator(
         parseInteger.or(
             skip(string("("))
@@ -128,7 +117,7 @@ public class SimpleExamples {
                   }
                 })));
 
-    Parser<Integer> calculator = Parsers.parser(parseExpression);
+    Parser<Integer> calculator = parseExpression.end();
 
     calculator.apply("4");          // 4
     calculator.apply("(1+1)");      // 2

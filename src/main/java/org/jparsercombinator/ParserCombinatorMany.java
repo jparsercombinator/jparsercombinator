@@ -3,16 +3,16 @@ package org.jparsercombinator;
 import java.util.ArrayList;
 import java.util.List;
 
-class CombinatorMany<T> implements Combinator<List<T>> {
+class ParserCombinatorMany<T> implements ParserCombinator<List<T>> {
 
-  private Combinator<T> combinator;
-  private Combinator<?> separator;
+  private ParserCombinator<T> combinator;
+  private ParserCombinator<?> separator;
 
-  CombinatorMany(Combinator<T> combinator) {
+  ParserCombinatorMany(ParserCombinator<T> combinator) {
     this.combinator = combinator;
   }
 
-  CombinatorMany(Combinator<T> combinator, Combinator<?> separator) {
+  ParserCombinatorMany(ParserCombinator<T> combinator, ParserCombinator<?> separator) {
     this.combinator = combinator;
     this.separator = separator;
   }

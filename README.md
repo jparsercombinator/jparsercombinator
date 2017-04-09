@@ -1,22 +1,19 @@
 # jparsercombinator
 
-Simple parser combinator written in Java.
-
-Requires JDK 1.8 or higher.
+Simple parser combinator written in Java 1.8.
 
 ## Usage examples
 
 Imports in examples:
 ```java
-import static org.jparsercombinator.Combinators.*;
-import static org.jparsercombinator.Parsers.parser;
 import org.jparsercombinator.*;
+import static org.jparsercombinator.ParserCombinators.*;
 ```
 
 Simplest parser recognizes constant string and accepts inputs matching it.
 
 ```java
-Parser<String> fooParser = parser(string("foo"));
+Parser<String> fooParser = string("foo").end();
 
 fooParser.apply("foo");  // returns "foo"
 fooParser.apply("bar");  // throws ParseException
@@ -25,7 +22,7 @@ fooParser.apply("bar");  // throws ParseException
 Parser accepting alternatives is defined as follows.
 
 ```java
-Parser<String> fooOrBarParser = parser(string("foo").or(string("bar")));
+Parser<String> fooOrBarParser = string("foo").or(string("bar")).end();
 
 fooOrBarParser.apply("foo");  // returns "foo"
 fooOrBarParser.apply("bar");  // returns "bar"
@@ -35,7 +32,7 @@ fooOrBarParser.apply("baz");  // throws ParseException
 Parser accepting sequences is defined as follows.
 
 ```java
-Parser<Pair<String, String>> fooAndBarParser = parser(string("foo").next(string("bar")));
+Parser<Pair<String, String>> fooAndBarParser = string("foo").next(string("bar")).end();
 
 fooAndBarParser.apply("foobar");  // returns ("foo", "bar")
 fooAndBarParser.apply("foo");     // throws ParseException
@@ -44,7 +41,7 @@ fooAndBarParser.apply("foo");     // throws ParseException
 Parse result can be mapped with given function.
 
 ```java
-Parser<Integer> integerParser = parser(regex("[0-9]+").map(Integer::parseInt));
+Parser<Integer> integerParser = regex("[0-9]+").map(Integer::parseInt).end();
 
 integerParser.apply("4");    // returns 4
 integerParser.apply("foo");  // throws ParseException
@@ -53,7 +50,7 @@ integerParser.apply("foo");  // throws ParseException
 Repeated parser recognizes multiple values and returns a list.
 
 ```java
-Parser<List<String>> fooManyParser = parser(string("foo").many());
+Parser<List<String>> fooManyParser = string("foo").many().end();
 
 fooManyParser.apply("foofoofoo");  // returns ["foo", "foo", "foo"]
 fooManyParser.apply("foobarfoo");  // throws ParseException
@@ -77,19 +74,21 @@ string or some more complex structure such as abstract syntax tree (AST).
 Parser combinator is defined as a parser which returns a Result object (either Accept or Reject).
 
 ```java
-public interface Combinator<T> extends Parser<Result<T>> {
+public interface ParserCombinator<T> extends Parser<Result<T>> {
+
   // ...
+
 }
 ```
 
 Accept contains parse result and remaining input string. Reject object signals failed parse 
 and contains only an error message. 
 
-Combinator also defines various default methods for combining it with other parse combinators to 
-produce more complex parsers.
+ParserCombinator also defines various default methods for combining it with other parse combinators
+to produce more complex parsers.
 
 ```java
-public interface Combinator<T> extends Parser<Result<T>> {
+public interface ParserCombinator<T> extends Parser<Result<T>> {
   
   default Combinator<T> or(Combinator<T> or) {
     return new CombinatorOr<>(this, or);
@@ -100,14 +99,14 @@ public interface Combinator<T> extends Parser<Result<T>> {
 }
 ```
 
-Base parsers can be created with static factory methods of Combinators class.
+Base parsers can be created with static factory methods of ParserCombinators class.
 
 ```java
-// from org.jparsercombinator.Combinators.*;
-Combinator<String> fooParser = string("foo");    // accepts "foo"
-Combinator<String> intParser = regex("[0-9]+");  // accepts integers
+// from org.jparsercombinator.ParserCombinators.*;
+ParserCombinator<String> fooParser = string("foo");    // accepts "foo"
+ParserCombinator<String> intParser = regex("[0-9]+");  // accepts integers
 
-Combinator<String> fooOrIntParser = string("foo").or(regex("[0-9]+")); // accepts "foo" or integers
+ParserCombinator<String> fooOrIntParser = string("foo").or(regex("[0-9]+")); // "foo" or integers
 ```
 
 ## More complex examples
@@ -116,11 +115,11 @@ Self referencing parsers may be defined using delegated reference.
 
 ```java
 // example of a recursive parser
-CombinatorReference<String> parenCombinator = newRef();
-
+ParserCombinatorReference<String> parenCombinator = newRef();
 parenCombinator.setCombinator(skip(string("(")).next(parenCombinator).skip(string(")")));
 
-Parser<String> parenParser = parser(parenCombinator);
+Parser<String> parenParser = parenCombinator.end();
+
 parenParser.apply("()");     // ""
 parenParser.apply("(())");   // ""
 parenParser.apply("((()))"); // ""
@@ -130,10 +129,9 @@ parenParser.apply("((()");   // throws ParseException
 Finally, a more complex example shows simple parser for evaluating "fully parenthesized" expressions.
 
 ```java
-Combinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
-Combinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
-CombinatorReference<Integer> parseExpression = newRef();
-
+ParserCombinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
+ParserCombinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
+ParserCombinatorReference<Integer> parseExpression = newRef();
 parseExpression.setCombinator(
     parseInteger.or(
         skip(string("("))
@@ -151,7 +149,7 @@ parseExpression.setCombinator(
               }
             })));
 
-Parser<Integer> calculator = Parsers.parser(parseExpression);
+Parser<Integer> calculator = parseExpression.end();
 
 calculator.apply("4");          // 4
 calculator.apply("(1+1)");      // 2
@@ -162,38 +160,28 @@ calculator.apply("((4/2)*2)");  // 4
 
 ## Error handling
 
-Parser combinator (Combinator) reads a string value and returns a Result object which is instance 
-of either Accept or Reject. Accept contains parse result and remaining input string. Reject contains 
-only an error message.
+Parser combinator reads a string value and returns a Result object which is instance of either
+Accept or Reject. Accept contains parse result and remaining input string. Reject contains only
+an error message.
 
 ```java
-Combinator<String> fooParserCombinator = string("foo");
+ParserCombinator<String> fooParserCombinator = string("foo");
 
 // apply and get the parse result, in this case "Accept" with result string and remaining input
 Result<String> accepted = fooParserCombinator.apply("foo");
-accepted.isAccepted();     // true
-accepted.result();         // "foo"
-accepted.remainingInput(); // ""
+accepted.isAccepted();      // true
+accepted.result();          // "foo"
+accepted.remainingInput();  // ""
 
 Result<String> rejected = fooParserCombinator.apply("bar");
-rejected.isAccepted();     // false
-rejected.errorMessage();   // ...
+rejected.isAccepted();      // false
+rejected.errorMessage();    // ...
 ```
 
-For simpler Exception based error handling (as in the examples), we can wrap Combinator with 
-Parsers.parser(...)
+For simpler use, a parser combinator is typically closed with an end method.
 
 ```java
-Parser<String> exceptionThrowingFooParser = parser(fooParserCombinator);
+Parser<String> exceptionThrowingFooParser = fooParserCombinator.end();
 exceptionThrowingFooParser.apply("foo");  // "foo"
 exceptionThrowingFooParser.apply("bar");  // throws ParseException
-```
-
-Another alternative is an optional returning parser with an error message consumer
-
-```java
-Parser<Optional<String>> optionalReturningFooParser = parser(fooParserCombinator, 
-    System.err::println);
-optionalReturningFooParser.apply("foo");  // Optional[foo]
-optionalReturningFooParser.apply("bar");  // Optional.empty (an error message is also printed to System.err)
 ```

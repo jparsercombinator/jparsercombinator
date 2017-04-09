@@ -4,11 +4,11 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RegexCombinator implements Combinator<MatchResult> {
+class RegexParserCombinator implements ParserCombinator<MatchResult> {
 
   private Pattern pattern;
 
-  RegexCombinator(Pattern pattern) {
+  RegexParserCombinator(Pattern pattern) {
     this.pattern = pattern;
   }
 

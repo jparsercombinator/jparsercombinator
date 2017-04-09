@@ -1,18 +1,17 @@
 package org.jparsercombinator.examples.json;
 
 
-import static org.jparsercombinator.Combinators.newRef;
-import static org.jparsercombinator.Combinators.regex;
-import static org.jparsercombinator.Combinators.regexFullResult;
-import static org.jparsercombinator.Combinators.skip;
-import static org.jparsercombinator.Combinators.string;
+import static org.jparsercombinator.ParserCombinators.newRef;
+import static org.jparsercombinator.ParserCombinators.regex;
+import static org.jparsercombinator.ParserCombinators.regexFullResult;
+import static org.jparsercombinator.ParserCombinators.skip;
+import static org.jparsercombinator.ParserCombinators.string;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
-import org.jparsercombinator.Combinator;
-import org.jparsercombinator.CombinatorReference;
+import org.jparsercombinator.ParserCombinator;
+import org.jparsercombinator.ParserCombinatorReference;
 import org.jparsercombinator.Parser;
-import org.jparsercombinator.Parsers;
 
 /**
  * Test parsing JSON primitives and objects. Note that the parser doesn't conform to full JSON
@@ -23,23 +22,23 @@ class JsonParser implements Parser<JsonElement> {
   private Parser<JsonElement> parser;
 
   JsonParser() {
-    CombinatorReference<JsonElement> jsonParser = newRef();
+    ParserCombinatorReference<JsonElement> jsonParser = newRef();
 
-    Combinator<JsonElement> jsonNullParser = string("null").map(v -> new JsonNull());
+    ParserCombinator<JsonElement> jsonNullParser = string("null").map(v -> new JsonNull());
 
-    Combinator<JsonElement> jsonBooleanParser =
+    ParserCombinator<JsonElement> jsonBooleanParser =
         regex("(true|false)").map(v -> new JsonPrimitive(Boolean.valueOf(v)));
-    Combinator<JsonElement> jsonIntegerParser =
+    ParserCombinator<JsonElement> jsonIntegerParser =
         regex("[0-9]+").map(v -> new JsonPrimitive(Integer.parseInt(v)));
-    Combinator<JsonElement> jsonStringParser =
+    ParserCombinator<JsonElement> jsonStringParser =
         regexFullResult("\"([^\"]*)\"").map(v -> new JsonPrimitive(v.group(1)));
-    Combinator<JsonElement> jsonPrimitiveParser =
+    ParserCombinator<JsonElement> jsonPrimitiveParser =
         jsonStringParser.or(jsonBooleanParser).or(jsonIntegerParser);
 
-    CombinatorReference<JsonElement> jsonObjectParser = newRef();
-    CombinatorReference<JsonElement> jsonArrayParser = newRef();
+    ParserCombinatorReference<JsonElement> jsonObjectParser = newRef();
+    ParserCombinatorReference<JsonElement> jsonArrayParser = newRef();
 
-    Combinator<Entry<String, JsonElement>> jsonObjectEntryParser =
+    ParserCombinator<Entry<String, JsonElement>> jsonObjectEntryParser =
         jsonStringParser.skip(string(":")).next(jsonParser)
             .map(pair -> new SimpleEntry<>(pair.first.toString(), pair.second));
 
@@ -58,7 +57,7 @@ class JsonParser implements Parser<JsonElement> {
     jsonParser.setCombinator(
         jsonNullParser.or(jsonPrimitiveParser).or(jsonArrayParser).or(jsonObjectParser));
 
-    parser = Parsers.parser(jsonParser);
+    parser = jsonParser.end();
   }
 
   @Override

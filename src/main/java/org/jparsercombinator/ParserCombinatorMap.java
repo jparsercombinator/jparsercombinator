@@ -2,12 +2,12 @@ package org.jparsercombinator;
 
 import java.util.function.Function;
 
-class CombinatorMap<T, R> implements Combinator<R> {
+class ParserCombinatorMap<T, R> implements ParserCombinator<R> {
 
-  private Combinator<T> combinator;
+  private ParserCombinator<T> combinator;
   private Function<T, R> mapping;
 
-  CombinatorMap(Combinator<T> combinator, Function<T, R> mapping) {
+  ParserCombinatorMap(ParserCombinator<T> combinator, Function<T, R> mapping) {
     this.combinator = combinator;
     this.mapping = mapping;
   }

@@ -1,14 +1,13 @@
 package org.jparsercombinator.examples.expression;
 
-import static org.jparsercombinator.Combinators.newRef;
-import static org.jparsercombinator.Combinators.regex;
-import static org.jparsercombinator.Combinators.skip;
-import static org.jparsercombinator.Combinators.string;
+import static org.jparsercombinator.ParserCombinators.newRef;
+import static org.jparsercombinator.ParserCombinators.regex;
+import static org.jparsercombinator.ParserCombinators.skip;
+import static org.jparsercombinator.ParserCombinators.string;
 
-import org.jparsercombinator.Combinator;
-import org.jparsercombinator.CombinatorReference;
+import org.jparsercombinator.ParserCombinator;
+import org.jparsercombinator.ParserCombinatorReference;
 import org.jparsercombinator.Parser;
-import org.jparsercombinator.Parsers;
 
 /**
  * Parser for parsing and evaluating of "fully parenthesized expressions":
@@ -20,11 +19,11 @@ class SimpleExpressionParser implements Parser<Integer> {
   private Parser<Integer> parser;
 
   SimpleExpressionParser() {
-    Combinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
-    Combinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
+    ParserCombinator<Integer> parseInteger = regex("[0-9]+").map(Integer::parseInt);
+    ParserCombinator<String> parseOperator = regex("(\\+|\\-|\\*|\\/)");
 
     // need to be defined as reference to avoid illegal self reference
-    CombinatorReference<Integer> parseExpression = newRef();
+    ParserCombinatorReference<Integer> parseExpression = newRef();
 
     parseExpression.setCombinator(
         parseInteger.or(
@@ -43,7 +42,7 @@ class SimpleExpressionParser implements Parser<Integer> {
                   }
                 })));
 
-    parser = Parsers.parser(parseExpression);
+    parser = parseExpression.end();
   }
 
   @Override

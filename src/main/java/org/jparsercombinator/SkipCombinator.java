@@ -2,13 +2,13 @@ package org.jparsercombinator;
 
 public class SkipCombinator {
 
-  private Combinator<?> skip;
+  private ParserCombinator<?> skip;
 
-  SkipCombinator(Combinator<?> skip) {
+  SkipCombinator(ParserCombinator<?> skip) {
     this.skip = skip;
   }
 
-  public <T> Combinator<T> next(Combinator<T> next) {
+  public <T> ParserCombinator<T> next(ParserCombinator<T> next) {
     return input -> {
       Result<?> skipResult = skip.apply(input);
 

@@ -1,11 +1,11 @@
 package org.jparsercombinator;
 
-class CombinatorOr<T> implements Combinator<T> {
+class ParserCombinatorOr<T> implements ParserCombinator<T> {
 
-  private Combinator<T> combinator;
-  private Combinator<T> or;
+  private ParserCombinator<T> combinator;
+  private ParserCombinator<T> or;
 
-  CombinatorOr(Combinator<T> combinator, Combinator<T> or) {
+  ParserCombinatorOr(ParserCombinator<T> combinator, ParserCombinator<T> or) {
     this.combinator = combinator;
     this.or = or;
   }

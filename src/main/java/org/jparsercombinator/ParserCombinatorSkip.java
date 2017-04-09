@@ -1,11 +1,11 @@
 package org.jparsercombinator;
 
-class CombinatorSkip<T> implements Combinator<T> {
+class ParserCombinatorSkip<T> implements ParserCombinator<T> {
 
-  private Combinator<T> combinator;
-  private Combinator<?> skip;
+  private ParserCombinator<T> combinator;
+  private ParserCombinator<?> skip;
 
-  CombinatorSkip(Combinator<T> combinator, Combinator<?> skip) {
+  ParserCombinatorSkip(ParserCombinator<T> combinator, ParserCombinator<?> skip) {
     this.combinator = combinator;
     this.skip = skip;
   }
