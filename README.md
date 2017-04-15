@@ -1,5 +1,7 @@
 # JParserCombinator
 
+[![Build Status](https://travis-ci.org/jparsercombinator/jparsercombinator.svg?branch=master)](https://travis-ci.org/jparsercombinator/jparsercombinator)
+
 Simple parser combinator for Java 1.8.
 
 ## Usage examples
