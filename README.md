@@ -1,6 +1,6 @@
-# jparsercombinator
+# JParserCombinator
 
-Simple parser combinator written in Java 1.8.
+Simple parser combinator for Java 1.8.
 
 ## Usage examples
 
