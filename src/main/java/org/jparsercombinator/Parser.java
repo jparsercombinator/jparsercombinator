@@ -1,8 +1,7 @@
 package org.jparsercombinator;
 
 /**
- * {@code Parser} is essentially a function that reads {@code String} input and returns parse result
- * of type {@code T}.
+ * {@code Parser} reads {@code String} input and returns result of type {@code T}.
  *
  * @param <T> type of the parse result
  */
