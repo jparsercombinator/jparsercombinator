@@ -4,9 +4,22 @@
 
 Simple parser combinator for Java 1.8.
 
+## Maven
+
+To add dependency on JParserCombinator with Maven, use:
+
+```xml
+<dependency>
+    <groupId>org.jparsercombinator</groupId>
+    <artifactId>jparsercombinator</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
 ## Usage examples
 
 Imports in examples:
+
 ```java
 import org.jparsercombinator.*;
 import static org.jparsercombinator.ParserCombinators.*;
