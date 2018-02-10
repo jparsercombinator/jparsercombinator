@@ -1,10 +1,13 @@
 package org.jparsercombinator;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.jparsercombinator.ParserCombinators.regex;
 import static org.jparsercombinator.ParserCombinators.string;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
@@ -28,7 +31,7 @@ public class ParserCombinatorTest {
   }
 
   @Test(expected = ParseException.class)
-  public void shouldNotAcceptWrongConstant() {
+  public void shouldNotParseWrongConstant() {
     fooParser.apply("bar");
   }
 
@@ -44,19 +47,55 @@ public class ParserCombinatorTest {
     assertEquals("bar", fooOrBarParser.apply("bar"));
   }
 
+  @Test(expected = ParseException.class)
+  public void shouldNotParseImpossibleConstants() {
+    fooOrBarParser.apply("baz");
+  }
+
   @Test
   public void shouldParseSequenceOfConstants() {
     assertEquals(new Pair<>("foo", "bar"), fooNextBarParser.apply("foobar"));
   }
 
   @Test(expected = ParseException.class)
-  public void shouldNotAcceptUnknownConstant() {
+  public void shouldNotParseWrongSequenceOfConstants() {
+    fooNextBarParser.apply("foofoobar");
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseUnknownConstant() {
     fooOrBarParser.apply("baz");
+  }
+
+  @Test
+  public void shouldParseRepeatedConstantWithZeroValues() {
+    assertEquals(emptyList(), fooRepeatingParser.apply(""));
+  }
+
+  @Test
+  public void shouldParseRepeatedConstantWithOneValue() {
+    assertEquals(singletonList("foo"), fooRepeatingParser.apply("foo"));
   }
 
   @Test
   public void shouldParseRepeatedConstant() {
     assertEquals(Arrays.asList("foo", "foo", "foo"), fooRepeatingParser.apply("foofoofoo"));
+  }
+
+  @Test
+  public void shouldParseLongRepeatedConstant() {
+    int repeats = 1000;
+
+    String input = String.join("", Collections.nCopies(repeats, "foo"));
+
+    List<String> result = fooRepeatingParser.apply(input);
+    assertEquals(repeats, result.size());
+    result.forEach(r -> assertEquals("foo", r));
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseRepeatedConstantWithExtraValues() {
+    fooRepeatingParser.apply("foofoofoobar");
   }
 
   @Test
@@ -66,8 +105,39 @@ public class ParserCombinatorTest {
   }
 
   @Test
+  public void shouldParseLongRepeatedCommaSeparatedConstant() {
+    int repeats = 1000;
+
+    String input = String.join(",", Collections.nCopies(repeats, "foo"));
+
+    List<String> result = fooRepeatingCommaSeparatedParser.apply(input);
+    assertEquals(repeats, result.size());
+    result.forEach(r -> assertEquals("foo", r));
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseRepeatedCommaSeparatedWithExtraCommas() {
+    fooRepeatingCommaSeparatedParser.apply("foo,foo,,foo");
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseRepeatedCommaSeparatedWithExtraTrailingComma() {
+    fooRepeatingCommaSeparatedParser.apply("foo,foo,foo,");
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseRepeatedCommaSeparatedWithExtraLeadingComma() {
+    fooRepeatingCommaSeparatedParser.apply(",foo,foo,foo");
+  }
+
+  @Test
   public void shouldParseInteger() {
     assertEquals(23, integerParser.apply("23").intValue());
+  }
+
+  @Test(expected = ParseException.class)
+  public void shouldNotParseNonInteger() {
+    integerParser.apply("23.2");
   }
 
 }

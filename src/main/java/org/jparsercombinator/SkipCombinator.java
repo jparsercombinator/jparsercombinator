@@ -27,9 +27,9 @@ public class SkipCombinator {
 
       if (skipResult.isAccepted()) {
         return next.apply(skipResult.remainingInput());
+      } else {
+        return new Reject<>(skipResult.errorMessage());
       }
-
-      return new Reject<>(skipResult.errorMessage());
     };
   }
 

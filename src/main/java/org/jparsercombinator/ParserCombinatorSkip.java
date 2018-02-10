@@ -15,16 +15,20 @@ class ParserCombinatorSkip<T> implements ParserCombinator<T> {
     Result<T> result = combinator.apply(input);
 
     if (result.isAccepted()) {
-      Result<?> skippedResult = skip.apply(result.remainingInput());
-
-      if (skippedResult.isAccepted()) {
-        return new Accept<>(result.result(), skippedResult.remainingInput());
-      } else {
-        return new Reject<>(skippedResult.errorMessage());
-      }
+      return resultSkipNext(result.result(), result.remainingInput());
+    } else {
+      return new Reject<>(result.errorMessage());
     }
+  }
 
-    return new Reject<>(result.errorMessage());
+  private Result<T> resultSkipNext(T result, String input) {
+    Result<?> skippedResult = skip.apply(input);
+
+    if (skippedResult.isAccepted()) {
+      return new Accept<>(result, skippedResult.remainingInput());
+    } else {
+      return new Reject<>(skippedResult.errorMessage());
+    }
   }
 
 }

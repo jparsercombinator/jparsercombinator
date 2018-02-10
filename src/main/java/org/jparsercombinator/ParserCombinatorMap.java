@@ -18,9 +18,9 @@ class ParserCombinatorMap<T, R> implements ParserCombinator<R> {
 
     if (result.isAccepted()) {
       return new Accept<>(mapping.apply(result.result()), result.remainingInput());
+    } else {
+      return new Reject<>(result.errorMessage());
     }
-
-    return new Reject<>(result.errorMessage());
   }
 
 }

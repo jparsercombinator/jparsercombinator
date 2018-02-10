@@ -12,20 +12,23 @@ class ParserCombinatorNext<T, R> implements ParserCombinator<Pair<T, R>> {
 
   @Override
   public Result<Pair<T, R>> apply(String input) {
-    Result<T> result = combinator.apply(input);
+    Result<T> first = combinator.apply(input);
 
-    if (result.isAccepted()) {
-      Result<R> nextResult = next.apply(result.remainingInput());
-
-      if (nextResult.isAccepted()) {
-        Pair<T, R> tuple = new Pair<>(result.result(), nextResult.result());
-        return new Accept<>(tuple, nextResult.remainingInput());
-      } else {
-        return new Reject<>(nextResult.errorMessage());
-      }
+    if (first.isAccepted()) {
+      return resultAndNext(first.result(), first.remainingInput());
+    } else {
+      return new Reject<>(first.errorMessage());
     }
+  }
 
-    return new Reject<>(result.errorMessage());
+  private Result<Pair<T, R>> resultAndNext(T first, String input) {
+    Result<R> nextResult = next.apply(input);
+
+    if (nextResult.isAccepted()) {
+      return new Accept<>(new Pair<>(first, nextResult.result()), nextResult.remainingInput());
+    } else {
+      return new Reject<>(nextResult.errorMessage());
+    }
   }
 
 }

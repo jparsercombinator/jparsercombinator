@@ -16,9 +16,9 @@ class ParserCombinatorOptional<T> implements ParserCombinator<Optional<T>> {
 
     if (result.isAccepted()) {
       return new Accept<>(Optional.of(result.result()), result.remainingInput());
+    } else {
+      return new Accept<>(Optional.empty(), input);
     }
-
-    return new Accept<>(Optional.empty(), input);
   }
 
 }

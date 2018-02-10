@@ -76,7 +76,7 @@ public interface ParserCombinator<T> extends Parser<Result<T>> {
    * possible.
    */
   default ParserCombinator<List<T>> many(ParserCombinator<?> separator) {
-    return new ParserCombinatorMany<>(this, separator);
+    return new ParserCombinatorManyWithSeparator<>(this, separator);
   }
 
   /**
