@@ -15,13 +15,13 @@ class ParserCombinatorNext<T, R> implements ParserCombinator<Pair<T, R>> {
     Result<T> first = combinator.apply(input);
 
     if (first.isAccepted()) {
-      return resultAndNext(first.result(), first.remainingInput());
+      return applyNext(first.result(), first.remainingInput());
     } else {
       return new Reject<>(first.errorMessage());
     }
   }
 
-  private Result<Pair<T, R>> resultAndNext(T first, String input) {
+  private Result<Pair<T, R>> applyNext(T first, String input) {
     Result<R> nextResult = next.apply(input);
 
     if (nextResult.isAccepted()) {

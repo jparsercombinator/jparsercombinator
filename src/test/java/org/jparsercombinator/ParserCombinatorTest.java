@@ -52,6 +52,11 @@ public class ParserCombinatorTest {
     fooOrBarParser.apply("baz");
   }
 
+  @Test(expected = ParseException.class)
+  public void shouldNotPrefixOrSuffixConstants() {
+    fooOrBarParser.apply("foobar");
+  }
+
   @Test
   public void shouldParseSequenceOfConstants() {
     assertEquals(new Pair<>("foo", "bar"), fooNextBarParser.apply("foobar"));
@@ -97,6 +102,12 @@ public class ParserCombinatorTest {
   public void shouldNotParseRepeatedConstantWithExtraValues() {
     fooRepeatingParser.apply("foofoofoobar");
   }
+
+  @Test
+  public void shouldParseRepeatedCommaSeparatedConstantWithZeroValues() {
+    assertEquals(emptyList(), fooRepeatingCommaSeparatedParser.apply(""));
+  }
+
 
   @Test
   public void shouldParseRepeatedCommaSeparatedConstant() {

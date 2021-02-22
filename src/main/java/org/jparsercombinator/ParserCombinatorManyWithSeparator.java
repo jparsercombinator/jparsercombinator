@@ -17,16 +17,12 @@ class ParserCombinatorManyWithSeparator<T> implements ParserCombinator<List<T>> 
   public Result<List<T>> apply(String input) {
     List<T> results = new ArrayList<>();
 
-    String remainingInput = input;
-    Result<T> lastResult = combinator.apply(remainingInput);
-
-    while (lastResult.isAccepted()) {
-      results.add(lastResult.result());
-      remainingInput = lastResult.remainingInput();
-      lastResult = applyWithSeparator(remainingInput);
+    for (Result<T> r = combinator.apply(input); r.isAccepted(); r = applyWithSeparator(input)) {
+      results.add(r.result());
+      input = r.remainingInput();
     }
 
-    return new Accept<>(results, remainingInput);
+    return new Accept<>(results, input);
   }
 
   private Result<T> applyWithSeparator(String input) {
